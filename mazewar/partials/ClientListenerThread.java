@@ -1,11 +1,26 @@
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Hashtable;
+import java.util.PriorityQueue;
+import java.util.Comparator;
+
 
 public class ClientListenerThread implements Runnable {
 
     private MSocket mSocket  =  null;
     private Hashtable<String, Client> clientTable = null;
+    private int nextExpected = 0;
+    private PriorityQueue<MPacket> packetPriorityQueue = 
+        new PriorityQueue<MPacket>(50, new packetSequenceComparator());
+
+    public class packetSequenceComparator implements Comparator<MPacket>
+    {
+        @Override
+        public int compare(MPacket x, MPacket y)
+        {
+            return x.sequenceNumber - y.sequenceNumber;
+        }
+    }
 
     public ClientListenerThread( MSocket mSocket,
                                 Hashtable<String, Client> clientTable){
@@ -21,7 +36,18 @@ public class ClientListenerThread implements Runnable {
         while(true){
             try{
                 received = (MPacket) mSocket.readObject();
-                System.out.println("Received " + received);
+                this.packetPriorityQueue.offer(received);
+                int headSeqNumer = this.packetPriorityQueue.peek().sequenceNumber;
+                if (headSeqNumer != this.nextExpected){
+                    System.out.println("OOO packet, expecting " + this.nextExpected + " but head has #" + headSeqNumer);
+                    continue;
+                }else{
+                    System.out.println("In order packet recved #" + headSeqNumer);
+                }
+                this.nextExpected++;
+                received = this.packetPriorityQueue.poll();
+                System.out.println("Processing packet #" + received.sequenceNumber);
+
                 client = clientTable.get(received.name);
                 if(received.event == MPacket.UP){
                     client.forward();

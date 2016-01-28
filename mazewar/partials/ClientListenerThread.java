@@ -3,6 +3,7 @@ import java.io.ObjectInputStream;
 import java.util.Hashtable;
 import java.util.PriorityQueue;
 import java.util.Comparator;
+import java.util.Arrays;
 
 
 public class ClientListenerThread implements Runnable {
@@ -18,6 +19,17 @@ public class ClientListenerThread implements Runnable {
         @Override
         public int compare(MPacket x, MPacket y)
         {
+            return x.sequenceNumber - y.sequenceNumber;
+        }
+    }
+
+    public class objSequenceComparator implements Comparator<Object>
+    {
+        @Override
+        public int compare(Object _x, Object _y)
+        {
+            MPacket x = (MPacket) _x;
+            MPacket y = (MPacket) _y;
             return x.sequenceNumber - y.sequenceNumber;
         }
     }
@@ -38,30 +50,26 @@ public class ClientListenerThread implements Runnable {
                 received = (MPacket) mSocket.readObject();
                 this.packetPriorityQueue.offer(received);
                 int headSeqNumer = this.packetPriorityQueue.peek().sequenceNumber;
-                if (headSeqNumer != this.nextExpected){
-                    System.out.println("OOO packet, expecting " + this.nextExpected + " but head has #" + headSeqNumer);
-                    continue;
-                }else{
-                    System.out.println("In order packet recved #" + headSeqNumer);
-                }
-                this.nextExpected++;
-                received = this.packetPriorityQueue.poll();
-                System.out.println("Processing packet #" + received.sequenceNumber);
+                while (this.packetPriorityQueue.size() != 0 && this.packetPriorityQueue.peek().sequenceNumber == this.nextExpected){
+                    this.nextExpected++;
+                    received = this.packetPriorityQueue.poll();
+                    System.out.println("Processing packet #" + received.sequenceNumber);
 
-                client = clientTable.get(received.name);
-                if(received.event == MPacket.UP){
-                    client.forward();
-                }else if(received.event == MPacket.DOWN){
-                    client.backup();
-                }else if(received.event == MPacket.LEFT){
-                    client.turnLeft();
-                }else if(received.event == MPacket.RIGHT){
-                    client.turnRight();
-                }else if(received.event == MPacket.FIRE){
-                    client.fire();
-                }else{
-                    throw new UnsupportedOperationException();
-                }    
+                    client = clientTable.get(received.name);
+                    if(received.event == MPacket.UP){
+                        client.forward();
+                    }else if(received.event == MPacket.DOWN){
+                        client.backup();
+                    }else if(received.event == MPacket.LEFT){
+                        client.turnLeft();
+                    }else if(received.event == MPacket.RIGHT){
+                        client.turnRight();
+                    }else if(received.event == MPacket.FIRE){
+                        client.fire();
+                    }else{
+                        throw new UnsupportedOperationException();
+                    }    
+                }
             }catch(IOException e){
                 e.printStackTrace();
             }catch(ClassNotFoundException e){

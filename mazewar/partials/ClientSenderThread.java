@@ -6,6 +6,7 @@ public class ClientSenderThread implements Runnable {
 
     private MSocket mSocket = null;
     private BlockingQueue<MPacket> eventQueue = null;
+    private int sequenceNumber = 0;
     
     public ClientSenderThread(MSocket mSocket,
                               BlockingQueue eventQueue){
@@ -20,6 +21,7 @@ public class ClientSenderThread implements Runnable {
             try{                
                 //Take packet from queue
                 toServer = (MPacket)eventQueue.take();
+                toServer.sequenceNumber = this.sequenceNumber++;
                 if(Debug.debug) System.out.println("Sending " + toServer);
                 mSocket.writeObject(toServer);    
             }catch(InterruptedException e){

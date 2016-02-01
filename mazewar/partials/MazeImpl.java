@@ -268,7 +268,46 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                 notifyClientRemove(client);
         }
 
-        public synchronized boolean clientFire(Client client) {
+        public synchronized boolean clientPJUpdate(Client client, int projectileID){
+                assert(client != null);
+
+                // if client has no projectile in flight, fail
+                // if client has a different projectile in flight, fail
+                if(clientFired.containsKey(client)) {
+                    int currentProjID = clientFired.get(clientFired);
+                    if (currentProjID != projectileID){
+                        return false;
+                    }
+                }else{
+                    return false;
+                }
+
+                Collection deadPrj = new HashSet();
+
+                // check if the object still exists
+                if(!projectileMap.isEmpty()) {
+                    synchronized(projectileMap) {
+                        Object o = projectileMap.get(client);
+                        assert(o instanceof Projectile);
+                        deadPrj.addAll(moveProjectile((Projectile)o));
+                        it = deadPrj.iterator();
+
+                        // this loop should only run once
+                        while(it.hasNext()) {
+                            Object o = it.next();
+                            assert(o instanceof Projectile);
+                            Projectile prj = (Projectile)o;
+                            projectileMap.remove(prj);
+                            clientFired.remove(prj.getOwner());
+                        }
+                        deadPrj.clear();
+                    }
+                }else{
+                    // ERROR
+                }
+        }
+
+        public synchronized boolean clientFire(Client client, int projectileID) {
                 assert(client != null);
                 // If the client already has a projectile in play
                 // fail.
@@ -613,7 +652,9 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
          * The set of {@link Client}s that have {@link Projectile}s in 
          * play.
          */
-        private final Set clientFired = new HashSet();
+        
+        // TODO: Change this to a hashmap client => projectileID
+        private final Map clientFired = new HashMap<Client, int>();
        
         /**
          * The thread used to manage {@link Projectile}s.

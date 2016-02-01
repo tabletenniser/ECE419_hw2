@@ -42,7 +42,13 @@ public class ServerListenerThread implements Runnable {
                     received = this.packetPriorityQueue.poll();
 
                     System.out.println("Processing packet #" + received.sequenceNumber);
-                    eventQueue.put(received);    
+
+                    // deal with fire abit differently
+                    if (received.event == MPacket.FIRE){
+                        new Thread(new ServerProjectileThread(eventQueue, received.name, received.projectileID)).start();
+                    }else{
+                        eventQueue.put(received);    
+                    }
                 }
             }catch(InterruptedException e){
                 e.printStackTrace();

@@ -34,10 +34,12 @@ public class GUIClient extends LocalClient implements KeyListener {
          * Create a GUI controlled {@link LocalClient}.  
          */
         private BlockingQueue eventQueue = null;
+        private int projectileID = 0;
         
         public GUIClient(String name, BlockingQueue eventQueue) {
                 super(name);
                 this.eventQueue = eventQueue;
+                this.projectileID = 0;
         }
         
         /**
@@ -67,8 +69,8 @@ public class GUIClient extends LocalClient implements KeyListener {
                                 eventQueue.put(new MPacket(getName(), MPacket.ACTION, MPacket.RIGHT));
                         // Spacebar fires.
                         } else if(e.getKeyCode() == KeyEvent.VK_SPACE) {
-                                //fire();
-                                eventQueue.put(new MPacket(getName(), MPacket.ACTION, MPacket.FIRE));
+                                //fire() with a projectile ID;
+                                eventQueue.put(new MPacket(getName(), MPacket.ACTION, MPacket.FIRE, this.projectileID++));
                         }
                 }catch(InterruptedException ie){
                         //An exception is caught, do something

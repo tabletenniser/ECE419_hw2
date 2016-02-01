@@ -170,15 +170,27 @@ public abstract class Client {
          * Fire a projectile.
          * @return <code>true</code> if a projectile was successfully launched, otherwise <code>false</code>.
          */
-        protected boolean fire() {
+        protected boolean fire(int projID) {
                 assert(maze != null);
 
-                if(maze.clientFire(this)) {
+                if(maze.clientFire(this, projID)) {
                         notifyFire();
                         return true;
                 } else {
                         return false;
                 }
+        }
+
+        protected boolean pj_update(int projID){
+                assert(maze != null);
+
+                if(maze.clientPJUpdate(this, projID)) {
+                        notifyPJUpdate();
+                        return true;
+                } else {
+                        return false;
+                }
+            
         }
         
         
@@ -215,6 +227,10 @@ public abstract class Client {
          */
         private void notifyFire() {
                 notifyListeners(ClientEvent.fire);       
+        }
+
+        private void notifyPJUpdate() {
+                notifyListeners(ClientEvent.pj_update);       
         }
         
         /**

@@ -23,17 +23,6 @@ public class ClientListenerThread implements Runnable {
         }
     }
 
-    public class objSequenceComparator implements Comparator<Object>
-    {
-        @Override
-        public int compare(Object _x, Object _y)
-        {
-            MPacket x = (MPacket) _x;
-            MPacket y = (MPacket) _y;
-            return x.sequenceNumber - y.sequenceNumber;
-        }
-    }
-
     public ClientListenerThread( MSocket mSocket,
                                 Hashtable<String, Client> clientTable){
         this.mSocket = mSocket;

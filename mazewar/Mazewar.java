@@ -1,22 +1,22 @@
 /*
 Copyright (C) 2004 Geoffrey Alan Washburn
-   
+
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation; either version 2
 of the License, or (at your option) any later version.
-   
+
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-   
+
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
 USA.
 */
-  
+
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
@@ -49,7 +49,7 @@ public class Mazewar extends JFrame {
 
         /**
          * The default random seed for the {@link Maze}.
-         * All implementations of the same protocol must use 
+         * All implementations of the same protocol must use
          * the same seed value, or your mazes will be different.
          */
         private final int mazeSeed = 42;
@@ -73,80 +73,80 @@ public class Mazewar extends JFrame {
          * The table the displays the scores.
          */
         private JTable scoreTable = null;
-        
-        /** 
-         * Create the textpane statically so that we can 
+
+        /**
+         * Create the textpane statically so that we can
          * write to it globally using
-         * the static consolePrint methods  
+         * the static consolePrint methods
          */
         private static final JTextPane console = new JTextPane();
-      
-        /** 
+
+        /**
          * Write a message to the console followed by a newline.
          * @param msg The {@link String} to print.
-         */ 
+         */
         public static synchronized void consolePrintLn(String msg) {
                 console.setText(console.getText()+msg+"\n");
         }
-        
-        /** 
+
+        /**
          * Write a message to the console.
          * @param msg The {@link String} to print.
-         */ 
+         */
         public static synchronized void consolePrint(String msg) {
                 console.setText(console.getText()+msg);
         }
-        
-        /** 
-         * Clear the console. 
+
+        /**
+         * Clear the console.
          */
         public static synchronized void clearConsole() {
            console.setText("");
         }
-        
+
         /**
          * Static method for performing cleanup before exiting the game.
          */
         public static void quit() {
                 // Put any network clean-up code you might have here.
-                // (inform other implementations on the network that you have 
+                // (inform other implementations on the network that you have
                 //  left, etc.)
-                
+
 
                 System.exit(0);
         }
-       
-        /** 
-         * The place where all the pieces are put together. 
+
+        /**
+         * The place where all the pieces are put together.
          */
         public Mazewar() {
                 super("ECE419 Mazewar");
                 consolePrintLn("ECE419 Mazewar started!");
-                
+
                 // Create the maze
                 maze = new MazeImpl(new Point(mazeWidth, mazeHeight), mazeSeed);
                 assert(maze != null);
-                
+
                 // Have the ScoreTableModel listen to the maze to find
                 // out how to adjust scores.
                 ScoreTableModel scoreModel = new ScoreTableModel();
                 assert(scoreModel != null);
                 maze.addMazeListener(scoreModel);
-                
+
                 // Throw up a dialog to get the GUIClient name.
                 String name = JOptionPane.showInputDialog("Enter your name");
                 if((name == null) || (name.length() == 0)) {
                   Mazewar.quit();
                 }
-                
+
                 // You may want to put your network initialization code somewhere in
                 // here.
-                
+
                 // Create the GUIClient and connect it to the KeyListener queue
                 guiClient = new GUIClient(name);
                 maze.addClient(guiClient);
                 this.addKeyListener(guiClient);
-                
+
                 // Use braces to force constructors not to be called at the beginning of the
                 // constructor.
                 {
@@ -156,22 +156,22 @@ public class Mazewar extends JFrame {
                         maze.addClient(new RobotClient("Marvin"));
                 }
 
-                
+
                 // Create the panel that will display the maze.
                 overheadPanel = new OverheadMazePanel(maze, guiClient);
                 assert(overheadPanel != null);
                 maze.addMazeListener(overheadPanel);
-                
+
                 // Don't allow editing the console from the GUI
                 console.setEditable(false);
                 console.setFocusable(false);
                 console.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder()));
-               
+
                 // Allow the console to scroll by putting it in a scrollpane
                 JScrollPane consoleScrollPane = new JScrollPane(console);
                 assert(consoleScrollPane != null);
                 consoleScrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Console"));
-                
+
                 // Create the score table
                 scoreTable = new JTable(scoreModel);
                 assert(scoreTable != null);
@@ -182,12 +182,12 @@ public class Mazewar extends JFrame {
                 JScrollPane scoreScrollPane = new JScrollPane(scoreTable);
                 assert(scoreScrollPane != null);
                 scoreScrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Scores"));
-                
+
                 // Create the layout manager
                 GridBagLayout layout = new GridBagLayout();
                 GridBagConstraints c = new GridBagConstraints();
                 getContentPane().setLayout(layout);
-                
+
                 // Define the constraints on the components.
                 c.fill = GridBagConstraints.BOTH;
                 c.weightx = 1.0;
@@ -201,12 +201,12 @@ public class Mazewar extends JFrame {
                 c.gridwidth = GridBagConstraints.REMAINDER;
                 c.weightx = 1.0;
                 layout.setConstraints(scoreScrollPane, c);
-                                
+
                 // Add the components
                 getContentPane().add(overheadPanel);
                 getContentPane().add(consoleScrollPane);
                 getContentPane().add(scoreScrollPane);
-                
+
                 // Pack everything neatly.
                 pack();
 
@@ -216,9 +216,9 @@ public class Mazewar extends JFrame {
                 this.requestFocusInWindow();
         }
 
-        
+
         /**
-         * Entry point for the game.  
+         * Entry point for the game.
          * @param args Command-line arguments.
          */
         public static void main(String args[]) {

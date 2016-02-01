@@ -35,6 +35,7 @@ public class RobotClient extends LocalClient implements Runnable {
          * "non-deterministic".
          */ 
          private final Random randomGen = new Random();
+         private int pID = 0;
 
          /**
           * The {@link Thread} object we use to run the robot control code.
@@ -111,7 +112,7 @@ public class RobotClient extends LocalClient implements Runnable {
 
                         // Shoot at things once and a while.
                         if(randomGen.nextInt(10) == 1) {
-                                fire();
+                                fire(pID++);
                         }
                         
                         // Sleep so the humans can possibly compete.

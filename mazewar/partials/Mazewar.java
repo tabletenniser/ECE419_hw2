@@ -47,12 +47,12 @@ public class Mazewar extends JFrame {
         /**
          * The default width of the {@link Maze}.
          */
-        private final int mazeWidth = 3;
+        private final int mazeWidth = 10;
 
         /**
          * The default height of the {@link Maze}.
          */
-        private final int mazeHeight = 2;
+        private final int mazeHeight = 1;
 
         /**
          * The default random seed for the {@link Maze}.

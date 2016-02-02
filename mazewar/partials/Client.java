@@ -187,7 +187,7 @@ public abstract class Client {
         protected boolean updateProjectile() {
                 assert(maze != null);
 
-                if(maze.updateProjectile()) {
+                if(maze.updateProjectile(this)) {
                         notifyUpdateProjectile();
                         return true;
                 } else {

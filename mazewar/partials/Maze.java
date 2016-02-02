@@ -75,7 +75,7 @@ public abstract class Maze {
      * Create a new {@link Projectile} from the specified {@link Client}
      * @param client {@link Client} that is firing.
      * @return <code>false</code> on failure, <code>true</code> on success. */
-    public abstract boolean updateProjectile();
+    public abstract boolean updateProjectile(Client client);
     
     /** 
      * Remove the specified {@link Client} from the {@link Maze} 

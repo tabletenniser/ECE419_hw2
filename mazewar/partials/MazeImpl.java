@@ -272,7 +272,8 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                 notifyClientRemove(client);
         }
 
-        public synchronized boolean updateProjectile(){
+        public synchronized boolean updateProjectile(Client client){
+            assert(client != null);
             if(!projectileMap.isEmpty()) {
                 Collection deadPrj = new HashSet();
                 Iterator it = projectileMap.keySet().iterator();
@@ -280,7 +281,8 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                         while(it.hasNext()) {   
                                 Object o = it.next();
                                 assert(o instanceof Projectile);
-                                deadPrj.addAll(moveProjectile((Projectile)o));
+                                if (client.getName().equals((((Projectile)o).getOwner()).getName()))
+                                    deadPrj.addAll(moveProjectile((Projectile)o));
                         }               
                         it = deadPrj.iterator();
                         while(it.hasNext()) {

@@ -180,6 +180,20 @@ public abstract class Client {
                         return false;
                 }
         }
+         /**
+         * Update a projectile.
+         * @return <code>true</code> if a projectile was successfully launched, otherwise <code>false</code>.
+         */
+        protected boolean updateProjectile() {
+                assert(maze != null);
+
+                if(maze.updateProjectile()) {
+                        notifyUpdateProjectile();
+                        return true;
+                } else {
+                        return false;
+                }
+        }
         
         
         /** 
@@ -216,6 +230,12 @@ public abstract class Client {
         private void notifyFire() {
                 notifyListeners(ClientEvent.fire);       
         }
+
+        private void notifyUpdateProjectile() {
+                notifyListeners(ClientEvent.updateProjectile);       
+        }
+
+        
         
         /**
          * Send a the specified {@link ClientEvent} to all registered listeners

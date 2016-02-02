@@ -47,19 +47,19 @@ public class Mazewar extends JFrame {
         /**
          * The default width of the {@link Maze}.
          */
-        private final int mazeWidth = 20;
+        private final int mazeWidth = 3;
 
         /**
          * The default height of the {@link Maze}.
          */
-        private final int mazeHeight = 10;
+        private final int mazeHeight = 2;
 
         /**
          * The default random seed for the {@link Maze}.
          * All implementations of the same protocol must use 
          * the same seed value, or your mazes will be different.
          */
-        private final int mazeSeed = 42;
+        private final int mazeSeed = 1;
 
         /**
          * The {@link Maze} that the game uses.
@@ -149,9 +149,21 @@ public class Mazewar extends JFrame {
                                                 ClassNotFoundException {
                 super("ECE419 Mazewar");
                 consolePrintLn("ECE419 Mazewar started!");
+
+                //Initialize queue of events
+                eventQueue = new LinkedBlockingQueue<MPacket>();
+                //Initialize hash table of clients to client name 
+                clientTable = new Hashtable<String, Client>();                
                 
+                // Throw up a dialog to get the GUIClient name.
+                String name = JOptionPane.showInputDialog("Enter your name");
+                if((name == null) || (name.length() == 0)) {
+                  Mazewar.quit();
+                }
+                guiClient = new GUIClient(name, eventQueue);
+
                 // Create the maze
-                maze = new MazeImpl(new Point(mazeWidth, mazeHeight), mazeSeed);
+                maze = new MazeImpl(new Point(mazeWidth, mazeHeight), mazeSeed, eventQueue, guiClient);
                 assert(maze != null);
                 
                 // Have the ScoreTableModel listen to the maze to find
@@ -159,12 +171,6 @@ public class Mazewar extends JFrame {
                 ScoreTableModel scoreModel = new ScoreTableModel();
                 assert(scoreModel != null);
                 maze.addMazeListener(scoreModel);
-                
-                // Throw up a dialog to get the GUIClient name.
-                String name = JOptionPane.showInputDialog("Enter your name");
-                if((name == null) || (name.length() == 0)) {
-                  Mazewar.quit();
-                }
                 
                 mSocket = new MSocket(serverHost, serverPort);
                 //Send hello packet to server
@@ -179,17 +185,12 @@ public class Mazewar extends JFrame {
                 MPacket resp = (MPacket)mSocket.readObject();
                 if(Debug.debug) System.out.println("Received response from server");
 
-                //Initialize queue of events
-                eventQueue = new LinkedBlockingQueue<MPacket>();
-                //Initialize hash table of clients to client name 
-                clientTable = new Hashtable<String, Client>(); 
                 
                 // Create the GUIClient and connect it to the KeyListener queue
                 //RemoteClient remoteClient = null;
                 for(Player player: resp.players){  
                         if(player.name.equals(name)){
                         	if(Debug.debug)System.out.println("Adding guiClient: " + player);
-                                guiClient = new GUIClient(name, eventQueue);
                                 maze.addClientAt(guiClient, player.point, player.direction);
                                 this.addKeyListener(guiClient);
                                 clientTable.put(player.name, guiClient);

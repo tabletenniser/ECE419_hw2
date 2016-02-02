@@ -30,7 +30,7 @@ public class MSocket{
     //This should be a value between [0, inf), with 
     // 1000 being a good value
     //To disable delays, set to 0.0
-    public final double DELAY_WEIGHT = 100.0;
+    public final double DELAY_WEIGHT = 1500.0;
     
     //This roughly corresponds to the likelihood 
     //of any delay. This should be a value between (-inf, inf)

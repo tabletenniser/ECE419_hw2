@@ -27,6 +27,7 @@ public class ServerListenerThread implements Runnable {
 
     public void run() {
         MPacket received = null;
+
         while(true){
             try{
                 received = (MPacket) mSocket.readObject();
@@ -44,11 +45,7 @@ public class ServerListenerThread implements Runnable {
                     System.out.println("Processing packet #" + received.sequenceNumber);
 
                     // deal with fire abit differently
-                    if (received.event == MPacket.FIRE){
-                        new Thread(new ServerProjectileThread(eventQueue, received.name, received.projectileID)).start();
-                    }else{
-                        eventQueue.put(received);    
-                    }
+                    eventQueue.put(received);    
                 }
             }catch(InterruptedException e){
                 e.printStackTrace();

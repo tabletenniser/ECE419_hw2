@@ -54,9 +54,9 @@ public class ClientListenerThread implements Runnable {
                     }else if(received.event == MPacket.RIGHT){
                         client.turnRight();
                     }else if(received.event == MPacket.FIRE){
-                        client.fire(received.projectileID);
+                        client.fire();
                     }else if(received.event == MPacket.PJ_UPDATE){
-                        client.pj_update(received.projectileID);
+                        client.pj_update();
                     }else{
                         throw new UnsupportedOperationException();
                     }    

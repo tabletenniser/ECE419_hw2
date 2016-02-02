@@ -70,6 +70,9 @@ public class ServerSenderThread implements Runnable {
         
         handleHello();
         
+        // send update every 200ms
+        new Thread(new ServerProjectileThread(eventQueue)).start();
+
         while(true){
             try{
                 //Take packet from queue to broadcast

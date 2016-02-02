@@ -268,52 +268,37 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                 notifyClientRemove(client);
         }
 
-        public synchronized boolean clientPJUpdate(Client client, int projectileID){
-                assert(client != null);
 
-                // if client has no projectile in flight, fail
-                // if client has a different projectile in flight, fail
-                if(clientFired.containsKey(client)) {
-                    int currentProjID = clientFired.get(clientFired);
-                    if (currentProjID != projectileID){
-                        return false;
-                    }
-                }else{
-                    return false;
-                }
-
-                Collection deadPrj = new HashSet();
-
-                // check if the object still exists
-                if(!projectileMap.isEmpty()) {
-                    synchronized(projectileMap) {
-                        Object o = projectileMap.get(client);
+        public synchronized boolean clientPJUpdate(){
+            Collection deadPrj = new HashSet();
+            if(!projectileMap.isEmpty()) {
+                Iterator it = projectileMap.keySet().iterator();
+                synchronized(projectileMap) {
+                    while(it.hasNext()) {   
+                        Object o = it.next();
                         assert(o instanceof Projectile);
                         deadPrj.addAll(moveProjectile((Projectile)o));
-                        Iterator it = deadPrj.iterator();
-
-                        // this loop should only run once
-                        while(it.hasNext()) {
-                            o = it.next();
-                            assert(o instanceof Projectile);
-                            Projectile prj = (Projectile)o;
-                            projectileMap.remove(prj);
-                            clientFired.remove(prj.getOwner());
-                        }
-                        deadPrj.clear();
+                    }               
+                    it = deadPrj.iterator();
+                    while(it.hasNext()) {
+                        Object o = it.next();
+                        assert(o instanceof Projectile);
+                        Projectile prj = (Projectile)o;
+                        projectileMap.remove(prj);
+                        clientFired.remove(prj.getOwner());
                     }
-                }else{
-                	return false;
-                    // ERROR
+                    deadPrj.clear();
                 }
                 return true;
+            }
+            return false;
         }
 
-        public synchronized boolean clientFire(Client client, int projectileID) {
+        public synchronized boolean clientFire(Client client) {
                 assert(client != null);
                 // If the client already has a projectile in play
                 // fail.
-                if(clientFired.containsKey(client)) {
+                if(clientFired.contains(client)) {
                         return false;
                 }
                 
@@ -345,7 +330,7 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                         }
                 }
                 
-                clientFired.put(client, projectileID);
+                clientFired.add(client);
                 Projectile prj = new Projectile(client);
                 
                 /* Write the new cell */
@@ -405,27 +390,7 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
          * Control loop for {@link Projectile}s.
          */
         public void run() {
-                Collection deadPrj = new HashSet();
                 while(true) {
-                        if(!projectileMap.isEmpty()) {
-                                Iterator it = projectileMap.keySet().iterator();
-                                synchronized(projectileMap) {
-                                        while(it.hasNext()) {   
-                                                Object o = it.next();
-                                                assert(o instanceof Projectile);
-                                                deadPrj.addAll(moveProjectile((Projectile)o));
-                                        }               
-                                        it = deadPrj.iterator();
-                                        while(it.hasNext()) {
-                                                Object o = it.next();
-                                                assert(o instanceof Projectile);
-                                                Projectile prj = (Projectile)o;
-                                                projectileMap.remove(prj);
-                                                clientFired.remove(prj.getOwner());
-                                        }
-                                        deadPrj.clear();
-                                }
-                        }
                         try {
                                 thread.sleep(200);
                         } catch(Exception e) {
@@ -656,7 +621,7 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
          */
         
         // TODO: Change this to a hashmap client => projectileID
-        private final HashMap<Client, Integer> clientFired = new HashMap<Client, Integer>();
+        private final Set clientFired = new HashSet();
        
         /**
          * The thread used to manage {@link Projectile}s.

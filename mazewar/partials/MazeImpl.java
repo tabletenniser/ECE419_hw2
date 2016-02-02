@@ -54,7 +54,6 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
         public MazeImpl(Point point, long seed, BlockingQueue eventQueue, Client client) {
                 this.eventQueue = eventQueue;
                 this.client = client;
-                System.out.println("MazeImpl constructor Client name:"+client.getName());
 
                 maxX = point.getX();
                 assert(maxX > 0);
@@ -394,7 +393,6 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
          */
         public void run() {
                 while(true) {
-                        System.out.println("Client name:"+this.client.getName());
                         try {
                             if(!projectileMap.isEmpty()) {
                                 Iterator it = projectileMap.keySet().iterator();
@@ -402,7 +400,6 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                                     while(it.hasNext()) {   
                                         Object o = it.next();
                                         assert(o instanceof Projectile);
-                                        System.out.println("Client name:"+this.client.getName()+"; Owner:"+(((Projectile)o).getOwner()).getName());
                                         if (this.client.getName().equals((((Projectile)o).getOwner()).getName()))
                                             this.eventQueue.put(new MPacket(((Projectile)o).getOwner().getName(), MPacket.ACTION, MPacket.UPDATE_PROJECTILE));
                                     }  
@@ -458,20 +455,22 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                 if(contents != null) {
                         // If it is a Client, kill it outright
                         if(contents instanceof Client) {
-                                killClient(prj.getOwner(), (Client)contents);
-                                cell.setContents(null);
-                                deadPrj.add(prj);
-                                update();
-                                return deadPrj;
+                            System.out.println("KILL ENEMY!!!!");
+                            killClient(prj.getOwner(), (Client)contents);
+                            cell.setContents(null);
+                            deadPrj.add(prj);
+                            update();
+                            return deadPrj;
                         } else {
                         // Bullets destroy each other
-                                assert(contents instanceof Projectile);
-                                newCell.setContents(null);
-                                cell.setContents(null);
-                                deadPrj.add(prj);
-                                deadPrj.add(contents);
-                                update();
-                                return deadPrj;
+                            System.out.println("BULLETS destroyED!!!!");
+                            assert(contents instanceof Projectile);
+                            newCell.setContents(null);
+                            cell.setContents(null);
+                            deadPrj.add(prj);
+                            deadPrj.add(contents);
+                            update();
+                            return deadPrj;
                         }
                 }
 
@@ -528,9 +527,9 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                         point = new Point(randomGen.nextInt(maxX),randomGen.nextInt(maxY));
                         cell = getCellImpl(point);
                 }
-                Direction d = Direction.random();
+                Direction d = Direction.North;
                 while(cell.isWall(d)) {
-                        d = Direction.random();
+                        d.turnLeft();
                 }
                 cell.setContents(target);
                 clientMap.put(target, new DirectedPoint(point, d));

@@ -1,8 +1,24 @@
 Team Members:
 Zexuan Wang (998851773): zexuan.wang@mail.utoronto.ca
 Yiming Kang (998676730): yiming.kang@mail.utoronto.ca
-==================================================================
+========================================================================
 
 Problems fixed from the partial solution:
 1. Package reordering
 In the provided partial solution, package does not necces
+
+
+
+
+
+3. location random bug
+As it's mentioned in the slide, when player spawns, the orientation is displayed inconsistently among differnt players. This is caused by lines 536 to 539 in MazeImpl.java where it's selected by random and it may be different between different GUIClient:
+    Direction d = Direction.random();
+        while(cell.isWall(d)) {
+            d = Direction.random();
+        }
+    }
+It is then changed to always facing North to avoid this incosistency.
+
+4. bullet projectile
+Another inconsistency in the partial solution is the fact that the bullet projectile is updated every 200ms by each GUIClient (in MazeImpl.java) and independent of all the client-server communication like all other events. This problem is solved by each GUIClient responsible for updating bullet projectile for itself. Each GUIClient has a counter of 200ms and sends a PROJECTILE_UPDATE event to server, the server stamps it with a Sequence number and broadcast to all clients to update the bullet projectile to ensure the bullet projectile update also follows an order.

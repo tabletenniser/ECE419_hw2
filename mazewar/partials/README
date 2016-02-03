@@ -1,8 +1,14 @@
-Team Members:
-Zexuan Wang (998851773): zexuan.wang@mail.utoronto.ca
-Yiming Kang (998676730): yiming.kang@mail.utoronto.ca
-==================================================================
+Team Members:  
+Zexuan Wang (998851773): zexuan.wang@mail.utoronto.ca  
+Yiming Kang (998676730): yiming.kang@mail.utoronto.ca  
+==================================================================  
 
-Problems fixed from the partial solution:
-1. Package reordering
-In the provided partial solution, package does not necces
+Problems fixed from the partial solution:  
+1. Package reordering on client  
+In the provided partial solution, client events (such as up, down, left, right) do not necessarily conform to the order they were issued by players. This is due to the possibility of package reordering when they arrive at ServerListenerThread. This issue can be resolved  by giving each pacakge sent (through GUIClient) a sequence number, a priority queue is used on ServerListenerThread to ensure packages are pushed on to eventQueue in order.
+
+GUIClient:   ------------------> ServerListenerThread  ----------------> ServerSenderThread  
+1-2-3 ===> Reorder ===> 2-1-3 ===> PriorityQueue ===> 1-2-3 ===> eventQueue ====> to Client  
+
+2. Pacakge reordering on server
+Similarly, packages arriving on ClientListenerThread should be processed in order, this is done with a PriorityQueue where global sequence numebr is used. The first packet to process had seqNum of 0, and packets will be cached in a PriorityQueue until one with seqNum of 1 is recieved. This guarantees that all players process packets in the same order, thus guranteeing consistency.

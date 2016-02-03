@@ -206,8 +206,8 @@ public class Mazewar extends JFrame {
                 // constructor.
                 
                 {
-                        maze.addClient(new RobotClient("Norby"));
-                        maze.addClient(new RobotClient("Robbie"));
+                        // maze.addClient(new RobotClient("Norby"));
+                        // maze.addClient(new RobotClient("Robbie"));
                         //maze.addClient(new RobotClient("Clango"));
                         //maze.addClient(new RobotClient("Marvin"));
                 }

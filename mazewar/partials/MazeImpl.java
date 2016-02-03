@@ -423,7 +423,7 @@ public class MazeImpl extends Maze implements Serializable, ClientListener, Runn
                                 //this.eventQueue.put(new MPacket(MPacket.ACTION, MPacket.UPDATE_PROJECTILE));
                             
                                 }
-                            thread.sleep(1000);
+                            thread.sleep(200);
                         } catch(Exception e) {
                             e.printStackTrace();
                         }

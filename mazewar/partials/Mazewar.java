@@ -47,12 +47,12 @@ public class Mazewar extends JFrame {
         /**
          * The default width of the {@link Maze}.
          */
-        private final int mazeWidth = 8;
+        private final int mazeWidth = 10;
 
         /**
          * The default height of the {@link Maze}.
          */
-        private final int mazeHeight = 1;
+        private final int mazeHeight = 10;
 
         /**
          * The default random seed for the {@link Maze}.
@@ -204,14 +204,13 @@ public class Mazewar extends JFrame {
                 
                 // Use braces to force constructors not to be called at the beginning of the
                 // constructor.
-                /*
+                
                 {
                         maze.addClient(new RobotClient("Norby"));
                         maze.addClient(new RobotClient("Robbie"));
-                        maze.addClient(new RobotClient("Clango"));
-                        maze.addClient(new RobotClient("Marvin"));
+                        //maze.addClient(new RobotClient("Clango"));
+                        //maze.addClient(new RobotClient("Marvin"));
                 }
-                */
 
                 
                 // Create the panel that will display the maze.
